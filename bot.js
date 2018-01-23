@@ -2,6 +2,12 @@ var TelegramBot = require("node-telegram-bot-api");
 var token = "502635179:AAEk9pjTW6JBGZIgeJXwMFbehEQ49gR3kVE";
 var axios = require("axios");
 var moment = require("moment");
+const express = require("express");
+const app = express();
+
+app.get("/", (req, res) => res.send("Hello World!"));
+
+app.listen(3000, () => console.log("Example app listening on port 3000!"));
 
 var bot = new TelegramBot(token, { polling: true });
 bot.getMe().then(function(me) {
