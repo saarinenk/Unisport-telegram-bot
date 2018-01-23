@@ -8,5 +8,10 @@
     "start": "node bot.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "moment": "^2.20.1",
+    "node-telegram-bot-api": "^0.30.0"
+  }
 }
