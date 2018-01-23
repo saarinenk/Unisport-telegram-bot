@@ -34,7 +34,12 @@ bot.onText(/\/unisport(.*)/, function(msg, match) {
     .then(m => {
       bot.sendMessage(
         fromId,
-        day.format("dddd DD.MM.YYYY [@ Otahalli:]") + "\n" + m.join("\n")
+        "*" +
+          day.format("dddd DD.MM.YYYY [@ Otahalli:]") +
+          "*" +
+          "\n> " +
+          m.join("\n> "),
+        { parse_mode: "Markdown" }
       );
     })
     .catch(() => bot.sendMessage(fromId, "Couldn't fetch data"));
@@ -70,37 +75,27 @@ function getUnisportData(date) {
   var uni_url =
     "https://unisport.fi/yol/web/fi/crud/read/event.json?date=" + date;
 
-  return (
-    axios({
-      method: "get",
-      url: uni_url,
-      responseType: "json"
-    })
-      .then(resp =>
-        resp.data.items
-          .filter(
-            i => i.venue == "Otahalli" && classes.indexOf(i.activity) > -1
-          )
-          .map(i => [
+  return axios({
+    method: "get",
+    url: uni_url,
+    responseType: "json"
+  })
+    .then(resp =>
+      resp.data.items
+        .filter(i => i.venue == "Otahalli" && classes.indexOf(i.activity) > -1)
+        .map(i => [
+          "*" +
             moment(i.startTime).format("H:mm") +
-              " " +
-              i.name.split("®")[0] +
-              "  @ " +
-              i.rooms[0]
-          ])
-      )
-      /*    .then(
-      function(response) {
-        var data = response.data.items
-          .filter(i => i.venue == "Otahalli" && classes.indexOf(i.name) > -1)
-          .map(i => i.name);
-        console.log(typeof data);
-        return data;
-      }.bind(this)) */
-      .catch(
-        function(error) {
-          console.log(error);
-        }.bind(this)
-      )
-  );
+            "*" +
+            " " +
+            i.name.split("®")[0] +
+            "  @ " +
+            i.rooms[0]
+        ])
+    )
+    .catch(
+      function(error) {
+        console.log(error);
+      }.bind(this)
+    );
 }
