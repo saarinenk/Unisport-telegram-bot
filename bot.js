@@ -68,7 +68,8 @@ var classes = [
   "Yin-jooga",
   "Hathajooga",
   "Niska-selkä",
-  "Kehonhuolto"
+  "Kehonhuolto",
+  "Total Training"
 ];
 
 function getUnisportData(date) {
