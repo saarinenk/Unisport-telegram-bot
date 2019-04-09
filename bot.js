@@ -74,7 +74,7 @@ var classes = [
 
 function getUnisportData(date) {
   var uni_url =
-    "https://unisport.fi/yol/web/fi/crud/read/event.json?date=" + date;
+    "https://api.unisport.fi/v1/fi/events?date=" + date;
 
   return axios({
     method: "get",
