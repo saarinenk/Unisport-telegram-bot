@@ -1,5 +1,5 @@
 var TelegramBot = require("node-telegram-bot-api");
-var token = "502635179:AAEk9pjTW6JBGZIgeJXwMFbehEQ49gR3kVE";
+var token = process.env.BOT_TOKEN;
 var axios = require("axios");
 var moment = require("moment");
 var express = require("express");
@@ -80,7 +80,7 @@ bot.onText(/\/unisport(.*)/, function(msg, match) {
   ]; // The keyboard array
   bot.sendMessage(
     msg.chat.id,
-    "Which schedule (how many days from today) do you want?",
+    "Which day's schedule (numbers meaning how many days from today) do you want?",
     {
       reply_markup: {
         inline_keyboard: kb
@@ -123,7 +123,8 @@ bot.on("callback_query", function onCallbackQuery(callbackQuery) {
 
 // match /help
 bot.onText(/\/help/, function(msg, match) {
-  var text = "With /unisport you get the unisport classes in Otahalli. .";
+  var text =
+    "With command /unisport you get the unisport classes in Otahalli. After the command you will be asked which day's schedule you want.";
   var fromId = msg.chat.id; // get the id, of who is sending the message
   bot.sendMessage(fromId, text);
 });
@@ -165,7 +166,11 @@ function getUnisportData(date) {
             " " +
             i.name.split("®")[0] +
             "  @ " +
-            i.rooms[0]
+            i.rooms[0] +
+            " | reservations: " +
+            i.reservations +
+            "/" +
+            i.maxReservations
         ])
     )
     .catch(
