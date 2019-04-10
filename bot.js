@@ -28,21 +28,45 @@ bot.getMe().then(function(me) {
 // match /unisport
 bot.onText(/\/unisport(.*)/, function(msg, match) {
   var fromId = msg.chat.id; // get the id, of who is sending the message
-  var givenDay = match[1].split(" ")[1];
-  var day = givenDay ? moment().add(givenDay, "days") : moment();
-  getUnisportData(day.format("YYYY-MM-DD"))
-    .then(m => {
-      bot.sendMessage(
-        fromId,
-        "*" +
-          day.format("dddd DD.MM.YYYY [@ Otahalli:]") +
+  var kb = [
+    ["today"],
+    ["tomorrow", "2", "3"],
+    ["4", "5", "6"],
+    ["7", "8", "9"]
+  ]; // The keyboard array
+  bot.sendMessage(
+    msg.chat.id,
+    "Which schedule (how many days from today) do you want?",
+    {
+      reply_markup: {
+        keyboard: kb,
+        one_time_keyboard: true
+      }
+    }
+  );
+
+  // allowing only numbers and letters
+  var reg = /^[a-zA-Z0-9_.-]*$/;
+  bot.onText(reg, function(msg, match) {
+    bot.sendMessage(msg.chat.id, "You selected " + match);
+    console.log(match);
+    var d = match[0] == "today" ? 0 : match[0] == "tomorrow" ? 1 : match[0];
+    var day = d ? moment().add(d, "days") : moment();
+    getUnisportData(day.format("YYYY-MM-DD"))
+      .then(m => {
+        bot.sendMessage(
+          fromId,
           "*" +
-          "\n> " +
-          m.join("\n> "),
-        { parse_mode: "Markdown" }
-      );
-    })
-    .catch(() => bot.sendMessage(fromId, "Couldn't fetch data"));
+            day.format("dddd DD.MM.YYYY [@ Otahalli:]") +
+            "*" +
+            "\n> " +
+            m.join("\n> "),
+          { parse_mode: "Markdown" }
+        );
+      })
+      .catch(() => bot.sendMessage(fromId, "Couldn't fetch data"));
+    var selectedSerie = msg.query;
+  });
 });
 
 // match /help
@@ -73,8 +97,7 @@ var classes = [
 ];
 
 function getUnisportData(date) {
-  var uni_url =
-    "https://api.unisport.fi/v1/fi/events?date=" + date;
+  var uni_url = "https://api.unisport.fi/v1/fi/events?date=" + date;
 
   return axios({
     method: "get",
