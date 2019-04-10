@@ -5,7 +5,9 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon bot.js"
+    "start": "node bot.js",
+    "start:dev": "nodemon bot.js",
+    "lint": "eslint bot.js"
   },
   "author": "",
   "license": "ISC",
@@ -13,7 +15,17 @@
     "axios": "^0.17.1",
     "express": "^4.16.4",
     "moment": "^2.24.0",
-    "node-telegram-bot-api": "^0.30.0",
-    "nodemon": "^1.18.11"
+    "node-telegram-bot-api": "^0.30.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-react": "^7.12.4",
+    "nodemon": "^1.18.11",
+    "prettier": "^1.16.4"
   }
 }
