@@ -1,5 +1,5 @@
 var TelegramBot = require("node-telegram-bot-api");
-var token = "502635179:AAEk9pjTW6JBGZIgeJXwMFbehEQ49gR3kVE";
+var token = process.env.BOT_TOKEN;
 var axios = require("axios");
 var moment = require("moment");
 var express = require("express");
@@ -28,8 +28,76 @@ bot.getMe().then(function(me) {
 // match /unisport
 bot.onText(/\/unisport(.*)/, function(msg, match) {
   var fromId = msg.chat.id; // get the id, of who is sending the message
-  var givenDay = match[1].split(" ")[1];
-  var day = givenDay ? moment().add(givenDay, "days") : moment();
+  var kb = [
+    [
+      {
+        text: "today",
+        callback_data: "0"
+      }
+    ],
+    [
+      {
+        text: "tomorrow",
+        callback_data: "1"
+      },
+      {
+        text: "2",
+        callback_data: "2"
+      },
+      {
+        text: "3",
+        callback_data: "3"
+      }
+    ],
+    [
+      {
+        text: "4",
+        callback_data: "4"
+      },
+      {
+        text: "5",
+        callback_data: "5"
+      },
+      {
+        text: "6",
+        callback_data: "6"
+      }
+    ],
+    [
+      {
+        text: "7",
+        callback_data: "7"
+      },
+      {
+        text: "8",
+        callback_data: "8"
+      },
+      {
+        text: "9",
+        callback_data: "9"
+      }
+    ]
+  ]; // The keyboard array
+  bot.sendMessage(
+    msg.chat.id,
+    "Which day's schedule (numbers meaning how many days from today) do you want?",
+    {
+      reply_markup: {
+        inline_keyboard: kb
+      }
+    }
+  );
+});
+
+// Handle callback queries
+bot.on("callback_query", function onCallbackQuery(callbackQuery) {
+  const action = callbackQuery.data;
+  const msg = callbackQuery.message;
+  var fromId = msg.chat.id;
+
+  var d = action == "today" ? 0 : action == "tomorrow" ? 1 : action;
+  var day = d ? moment().add(d, "days") : moment();
+
   getUnisportData(day.format("YYYY-MM-DD"))
     .then(m => {
       bot.sendMessage(
@@ -42,13 +110,21 @@ bot.onText(/\/unisport(.*)/, function(msg, match) {
         { parse_mode: "Markdown" }
       );
     })
-    .catch(() => bot.sendMessage(fromId, "Couldn't fetch data"));
+    .then(() => {
+      bot.deleteMessage(fromId, msg.message_id);
+    })
+    .catch(err => {
+      console.log(err);
+      bot.sendMessage(fromId, "Couldn't fetch data");
+    });
+
+  bot.editMessageText(text, opts);
 });
 
 // match /help
 bot.onText(/\/help/, function(msg, match) {
   var text =
-    "By sending /unisport you get the unisport classes of this day in Otahalli. By adding a space and a number to the end, you can get the classes of that day which is that many days away. For example '/unisport 2' gives the classes of the day after tomorrow.";
+    "With command /unisport you get the unisport classes in Otahalli. After the command you will be asked which day's schedule you want.";
   var fromId = msg.chat.id; // get the id, of who is sending the message
   bot.sendMessage(fromId, text);
 });
@@ -73,8 +149,7 @@ var classes = [
 ];
 
 function getUnisportData(date) {
-  var uni_url =
-    "https://api.unisport.fi/v1/fi/events?date=" + date;
+  var uni_url = "https://api.unisport.fi/v1/fi/events?date=" + date;
 
   return axios({
     method: "get",
@@ -91,7 +166,11 @@ function getUnisportData(date) {
             " " +
             i.name.split("®")[0] +
             "  @ " +
-            i.rooms[0]
+            i.rooms[0] +
+            " | reservations: " +
+            i.reservations +
+            "/" +
+            i.maxReservations
         ])
     )
     .catch(
