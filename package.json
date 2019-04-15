@@ -14,7 +14,6 @@
     "axios": "^0.17.1",
     "express": "^4.16.4",
     "moment": "^2.24.0",
-    "node-telegram-bot-api": "^0.30.0",
-    "nodemon": "^1.18.11"
+    "node-telegram-bot-api": "^0.30.0"
   }
 }
